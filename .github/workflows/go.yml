@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GOLANGCI_LINT_VERSION: v1.55.2
-      CGO_ENABLED: 0
 
     strategy:
       matrix:
