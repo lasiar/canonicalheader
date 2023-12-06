@@ -5,7 +5,7 @@ import (
 
 	"golang.org/x/tools/go/analysis/analysistest"
 
-	analyzer "github.com/Lasiar/canonicalHeader"
+	analyzer "github.com/lasiar/canonicalHeader"
 )
 
 func TestAnalyzer(t *testing.T) {
