@@ -1,4 +1,4 @@
-module github.com/Lasiar/canonicalHeader
+module github.com/lasiar/canonicalHeader
 
 go 1.21
 
