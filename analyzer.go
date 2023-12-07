@@ -120,7 +120,6 @@ func run(pass *analysis.Pass) (any, error) {
 		ast.Inspect(f, inspect)
 	}
 
-	//nolint:nilnil // not need return.
 	return nil, outerErr
 }
 
