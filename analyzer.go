@@ -20,8 +20,8 @@ const (
 )
 
 var Analyzer = &analysis.Analyzer{
-	Name: "canonicalHeader",
-	Doc:  "canonicalHeader checks whether net/http.Header uses canonical header",
+	Name: "canonicalheader",
+	Doc:  "canonicalheader checks whether net/http.Header uses canonical header",
 	Run:  run,
 }
 
