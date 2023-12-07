@@ -121,7 +121,7 @@ func run(pass *analysis.Pass) (any, error) {
 	}
 
 	//nolint:nilnil // not need return.
-	return nil, nil
+	return nil, outerErr
 }
 
 func isHTTPHeader(named *types.Named) bool {
