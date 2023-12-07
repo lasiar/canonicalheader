@@ -3,9 +3,9 @@ package main
 import (
 	"golang.org/x/tools/go/analysis/singlechecker"
 
-	analyzer "github.com/lasiar/canonicalHeader"
+	"github.com/lasiar/canonicalheader"
 )
 
 func main() {
-	singlechecker.Main(analyzer.Analyzer)
+	singlechecker.Main(canonicalheader.Analyzer)
 }
