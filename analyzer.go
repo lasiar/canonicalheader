@@ -1,4 +1,4 @@
-package analyer
+package canonicalheader
 
 import (
 	"fmt"

@@ -1,11 +1,11 @@
-package analyer_test
+package canonicalheader_test
 
 import (
 	"testing"
 
 	"golang.org/x/tools/go/analysis/analysistest"
 
-	analyzer "github.com/lasiar/canonicalHeader"
+	"github.com/lasiar/canonicalheader"
 )
 
 func TestAnalyzer(t *testing.T) {
@@ -13,7 +13,7 @@ func TestAnalyzer(t *testing.T) {
 	analysistest.RunWithSuggestedFixes(
 		t,
 		analysistest.TestData(),
-		analyzer.Analyzer,
+		canonicalheader.Analyzer,
 		"p",
 	)
 }
