@@ -1,6 +1,6 @@
-# perfsprint
+# canonicalheader
 
-[![CI](https://github.com/lasiar/canonicalheader/actions/workflows/go.yml/badge.svg)](https://github.com/Lasiar/canonicalheader/actions/workflows/go.yml)
+[![CI](https://github.com/lasiar/canonicalheader/actions/workflows/go.yml/badge.svg)](https://github.com/lasiar/canonicalheader/actions/workflows/go.yml)
 
 Golang linter for check canonical header.
 
