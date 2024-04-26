@@ -1,4 +1,4 @@
-package p
+package common
 
 import (
 	"net/http"
@@ -21,4 +21,8 @@ func p() {
 	v.Add("Test-Header", "value")
 	v.Del("Test-Header")
 	v.Values("Test-Header")
+
+	v.Write(nil)
+	v.Clone()
+	v.WriteSubset(nil, nil)
 }
