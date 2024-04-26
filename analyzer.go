@@ -11,7 +11,9 @@ import (
 
 	"github.com/go-toolsmith/astcast"
 	"golang.org/x/tools/go/analysis"
-	"golang.org/x/tools/go/ast/astutil"
+	"golang.org/x/tools/go/analysis/passes/inspect"
+	"golang.org/x/tools/go/ast/inspector"
+	"golang.org/x/tools/go/types/typeutil"
 )
 
 const (
@@ -20,64 +22,84 @@ const (
 )
 
 var Analyzer = &analysis.Analyzer{
-	Name: "canonicalheader",
-	Doc:  "canonicalheader checks whether net/http.Header uses canonical header",
-	Run:  run,
+	Name:     "canonicalheader",
+	Doc:      "canonicalheader checks whether net/http.Header uses canonical header",
+	Run:      run,
+	Requires: []*analysis.Analyzer{inspect.Analyzer},
 }
 
 func run(pass *analysis.Pass) (any, error) {
+	spctor, ok := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
+	if !ok {
+		return nil, fmt.Errorf("want %T, got %T", spctor, pass.ResultOf[inspect.Analyzer])
+	}
+
+	nodeFilter := []ast.Node{
+		(*ast.CallExpr)(nil),
+	}
 	var outerErr error
-	inspect := func(node ast.Node) bool {
+
+	spctor.Preorder(nodeFilter, func(n ast.Node) {
 		if outerErr != nil {
-			return false
+			return
 		}
 
-		callExp, ok := node.(*ast.CallExpr)
+		callExp, ok := n.(*ast.CallExpr)
 		if !ok {
-			return true
+			return
 		}
 
-		selExp, ok := callExp.Fun.(*ast.SelectorExpr)
+		fn, ok := typeutil.Callee(pass.TypesInfo, callExp).(*types.Func)
 		if !ok {
-			return false
+			return
 		}
 
-		object, ok := pass.TypesInfo.TypeOf(selExp.X).(*types.Named)
+		signature, ok := fn.Type().(*types.Signature)
 		if !ok {
-			return false
+			return
+		}
+
+		recv := signature.Recv()
+		if recv == nil {
+			return
+		}
+
+		object, ok := recv.Type().(*types.Named)
+		if !ok {
+			return
 		}
 
 		if !isHTTPHeader(object) {
-			return false
+			return
 		}
 
 		if !isValidMethod(astcast.ToSelectorExpr(callExp.Fun).Sel.Name) {
-			return false
+			return
 		}
 
 		arg, ok := callExp.Args[0].(*ast.BasicLit)
 		if !ok {
-			return false
+			return
 		}
 
 		if arg.Kind != token.STRING {
-			return true
+			return
 		}
 
 		if len(arg.Value) < 2 {
-			return true
+			return
 		}
 
 		quote := arg.Value[0]
 		headerKeyOriginal, err := strconv.Unquote(arg.Value)
 		if err != nil {
 			outerErr = err
-			return true
+			return
 		}
 
 		headerKeyCanonical := http.CanonicalHeaderKey(headerKeyOriginal)
 		if headerKeyOriginal == headerKeyCanonical {
-			return true
+			return
 		}
 
 		newText := make([]byte, 0, len(headerKeyCanonical)+2)
@@ -104,21 +126,7 @@ func run(pass *analysis.Pass) (any, error) {
 				},
 			},
 		)
-
-		return true
-	}
-
-	for _, f := range pass.Files {
-		if outerErr != nil {
-			return nil, outerErr
-		}
-
-		if !astutil.UsesImport(f, pkgPath) {
-			continue
-		}
-
-		ast.Inspect(f, inspect)
-	}
+	})
 
 	return nil, outerErr
 }

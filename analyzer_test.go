@@ -2,8 +2,11 @@ package canonicalheader_test
 
 import (
 	"net/http"
+	"os"
+	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"golang.org/x/tools/go/analysis/analysistest"
 
 	"github.com/lasiar/canonicalheader"
@@ -13,12 +16,56 @@ const testValue = "hello_world"
 
 func TestAnalyzer(t *testing.T) {
 	t.Parallel()
-	analysistest.RunWithSuggestedFixes(
-		t,
-		analysistest.TestData(),
-		canonicalheader.Analyzer,
-		"p",
-	)
+
+	testCases := []struct {
+		dir string
+	}{
+		{
+			dir: "alias",
+		},
+
+		{
+			dir: "common",
+		},
+
+		{
+			dir: "embedded",
+		},
+
+		{
+			dir: "global",
+		},
+
+		{
+			dir: "struct",
+		},
+	}
+
+	for _, tt := range testCases {
+		tt := tt
+		t.Run(tt.dir, func(t *testing.T) {
+			t.Parallel()
+
+			analysistest.RunWithSuggestedFixes(
+				t,
+				analysistest.TestData(),
+				canonicalheader.Analyzer,
+				tt.dir,
+			)
+		})
+	}
+
+	t.Run("are_test_cases_complete", func(t *testing.T) {
+		t.Parallel()
+
+		dirs, err := os.ReadDir(filepath.Join(analysistest.TestData(), "src"))
+		require.NoError(t, err)
+		require.Len(t, testCases, len(dirs))
+
+		for i, dir := range dirs {
+			require.Equal(t, dir.Name(), testCases[i].dir)
+		}
+	})
 }
 
 func BenchmarkCanonical(b *testing.B) {
