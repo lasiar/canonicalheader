@@ -1,6 +1,9 @@
 # canonicalheader
 
 [![CI](https://github.com/lasiar/canonicalheader/actions/workflows/go.yml/badge.svg)](https://github.com/lasiar/canonicalheader/actions/workflows/go.yml)
+[![tag](https://img.shields.io/github/tag/lasiar/canonicalheader.svg)](https://github.com/lasiar/canonicalheader/releases)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lasiar/canonicalheader)](https://goreportcard.com/report/github.com/lasiar/canonicalheader)
+[![License](https://img.shields.io/github/license/lasiar/canonicalheader)](./LICENSE)
 
 Golang linter for check canonical header.
 
