@@ -16,14 +16,25 @@ jobs:
 
     strategy:
       matrix:
-        go: ['stable', 'oldstable']
+        go-version: ['stable', 'oldstable', tip]
 
     steps:
-      - name: Set up Go 1.x
-        uses: actions/setup-go@v5
+      - name: Install Go stable
+        if: matrix.go-version != 'tip'
+        uses: actions/setup-go@master
         with:
-          go-version: ${{ matrix.go }}
-          check-latest: true
+          go-version: ${{ matrix.go-version }}
+
+      - name: Install Go tip
+        if: matrix.go-version == 'tip'
+        run: |
+          curl -sL https://storage.googleapis.com/go-build-snap/go/linux-amd64/$(git ls-remote https://github.com/golang/go.git HEAD | awk '{print $1;}').tar.gz -o gotip.tar.gz
+          ls -lah gotip.tar.gz
+          mkdir -p ~/sdk/gotip
+          tar -C ~/sdk/gotip -xzf gotip.tar.gz
+          ~/sdk/gotip/bin/go version
+          echo "PATH=$HOME/go/bin:$HOME/sdk/gotip/bin/:$PATH" >> $GITHUB_ENV
+          go version
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v4
