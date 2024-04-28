@@ -2,10 +2,10 @@ package embedded
 
 import "net/http"
 
-type embeded struct {
+type embedded struct {
 	http.Header
 }
 
 func _() {
-	embeded{}.Get("TT") // want `non-canonical header "TT", instead use: "Tt"`
+	embedded{}.Get("TT") // want `non-canonical header "TT", instead use: "Tt"`
 }
