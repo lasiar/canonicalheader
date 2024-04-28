@@ -17,40 +17,24 @@ const testValue = "hello_world"
 func TestAnalyzer(t *testing.T) {
 	t.Parallel()
 
-	testCases := []struct {
-		dir string
-	}{
-		{
-			dir: "alias",
-		},
-
-		{
-			dir: "common",
-		},
-
-		{
-			dir: "embedded",
-		},
-
-		{
-			dir: "global",
-		},
-
-		{
-			dir: "struct",
-		},
+	testCases := [...]string{
+		"alias",
+		"common",
+		"embedded",
+		"global",
+		"struct",
 	}
 
 	for _, tt := range testCases {
 		tt := tt
-		t.Run(tt.dir, func(t *testing.T) {
+		t.Run(tt, func(t *testing.T) {
 			t.Parallel()
 
 			analysistest.RunWithSuggestedFixes(
 				t,
 				analysistest.TestData(),
 				canonicalheader.Analyzer,
-				tt.dir,
+				tt,
 			)
 		})
 	}
@@ -63,7 +47,7 @@ func TestAnalyzer(t *testing.T) {
 		require.Len(t, testCases, len(dirs))
 
 		for i, dir := range dirs {
-			require.Equal(t, dir.Name(), testCases[i].dir)
+			require.Equal(t, dir.Name(), testCases[i])
 		}
 	})
 }
