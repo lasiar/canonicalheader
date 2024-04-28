@@ -20,9 +20,11 @@ func TestAnalyzer(t *testing.T) {
 	testCases := [...]string{
 		"alias",
 		"common",
+		"const",
 		"embedded",
 		"global",
 		"struct",
+		"underlying",
 	}
 
 	for _, tt := range testCases {
@@ -46,10 +48,23 @@ func TestAnalyzer(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, testCases, len(dirs))
 
-		for i, dir := range dirs {
-			require.Equal(t, dir.Name(), testCases[i])
-		}
+		require.EqualValues(
+			t,
+			transform(dirs, func(d os.DirEntry) string {
+				return d.Name()
+			}),
+			testCases,
+		)
 	})
+}
+
+func transform[S ~[]E, E any, T any](sl S, f func(E) T) []T {
+	out := make([]T, len(sl))
+	for i, t := range sl {
+		out[i] = f(t)
+	}
+
+	return out
 }
 
 func BenchmarkCanonical(b *testing.B) {

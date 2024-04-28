@@ -3,11 +3,8 @@ package canonicalheader
 import (
 	"fmt"
 	"go/ast"
-	"go/token"
 	"go/types"
 	"net/http"
-	"strconv"
-	"unsafe"
 
 	"github.com/go-toolsmith/astcast"
 	"golang.org/x/tools/go/analysis"
@@ -28,7 +25,27 @@ var Analyzer = &analysis.Analyzer{
 	Requires: []*analysis.Analyzer{inspect.Analyzer},
 }
 
+type argumenter interface {
+	diagnostic(canonicalHeader string) analysis.Diagnostic
+	value() string
+}
+
 func run(pass *analysis.Pass) (any, error) {
+	var headerObject types.Object
+	for _, object := range pass.TypesInfo.Uses {
+		if object.Pkg() != nil &&
+			object.Pkg().Path() == pkgPath &&
+			object.Name() == name {
+			headerObject = object
+			break
+		}
+	}
+
+	if headerObject == nil {
+		//nolint:nilnil // nothing to do here, because http.Header{} not usage.
+		return nil, nil
+	}
+
 	spctor, ok := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 	if !ok {
 		return nil, fmt.Errorf("want %T, got %T", spctor, pass.ResultOf[inspect.Analyzer])
@@ -54,88 +71,105 @@ func run(pass *analysis.Pass) (any, error) {
 			return
 		}
 
+		// Find net/http.Header{} by function call.
 		signature, ok := fn.Type().(*types.Signature)
 		if !ok {
 			return
 		}
 
 		recv := signature.Recv()
+		// It's a func, not a method.
 		if recv == nil {
 			return
 		}
 
-		object, ok := recv.Type().(*types.Named)
-		if !ok {
+		// It is not net/http.Header{}
+		if !types.Identical(recv.Type(), headerObject.Type()) {
 			return
 		}
 
-		if !isHTTPHeader(object) {
-			return
-		}
-
+		// Search by knows methods, where the key is first arg.
 		if !isValidMethod(astcast.ToSelectorExpr(callExp.Fun).Sel.Name) {
 			return
 		}
 
-		arg, ok := callExp.Args[0].(*ast.BasicLit)
-		if !ok {
+		// Should be more than one. Because get the value by index it
+		// will not be superfluous.
+		if len(callExp.Args) == 0 {
 			return
 		}
 
-		if arg.Kind != token.STRING {
+		callArg := callExp.Args[0]
+
+		// Check for type casting from myString to string.
+		// it could be: Get(string(string(string(myString)))).
+		// need this node------------------------^^^^^^^^
+		for {
+			// If it is not *ast.CallExpr, this is a value.
+			c, ok := callArg.(*ast.CallExpr)
+			if !ok {
+				break
+			}
+
+			// Some function is called, skip this case.
+			if len(c.Args) == 0 {
+				return
+			}
+
+			f, ok := c.Fun.(*ast.Ident)
+			if !ok {
+				break
+			}
+
+			obj := pass.TypesInfo.ObjectOf(f)
+			// nil may be by code, but not by logic.
+			// TypeInfo should contain of type.
+			if obj == nil {
+				break
+			}
+
+			// This is function.
+			// Skip this method call.
+			_, ok = obj.Type().(*types.Signature)
+			if ok {
+				return
+			}
+
+			callArg = c.Args[0]
+		}
+
+		var arg argumenter
+		switch t := callArg.(type) {
+		case *ast.BasicLit:
+			lString, err := newLiteralString(t)
+			if err != nil {
+				return
+			}
+
+			arg = lString
+
+		case *ast.Ident:
+			constString, err := newConstantKey(pass.TypesInfo, t)
+			if err != nil {
+				return
+			}
+
+			arg = constString
+
+		default:
 			return
 		}
 
-		if len(arg.Value) < 2 {
+		argValue := arg.value()
+		headerKeyCanonical := http.CanonicalHeaderKey(argValue)
+		if argValue == headerKeyCanonical {
 			return
 		}
 
-		quote := arg.Value[0]
-		headerKeyOriginal, err := strconv.Unquote(arg.Value)
-		if err != nil {
-			outerErr = err
-			return
-		}
-
-		headerKeyCanonical := http.CanonicalHeaderKey(headerKeyOriginal)
-		if headerKeyOriginal == headerKeyCanonical {
-			return
-		}
-
-		newText := make([]byte, 0, len(headerKeyCanonical)+2)
-		newText = append(newText, quote)
-		newText = append(newText, unsafe.Slice(unsafe.StringData(headerKeyCanonical), len(headerKeyCanonical))...)
-		newText = append(newText, quote)
-
-		pass.Report(
-			analysis.Diagnostic{
-				Pos:     arg.Pos(),
-				End:     arg.End(),
-				Message: fmt.Sprintf("non-canonical header %q, instead use: %q", headerKeyOriginal, headerKeyCanonical),
-				SuggestedFixes: []analysis.SuggestedFix{
-					{
-						Message: fmt.Sprintf("should replace %q with %q", headerKeyOriginal, headerKeyCanonical),
-						TextEdits: []analysis.TextEdit{
-							{
-								Pos:     arg.Pos(),
-								End:     arg.End(),
-								NewText: newText,
-							},
-						},
-					},
-				},
-			},
-		)
+		pass.Report(arg.diagnostic(headerKeyCanonical))
 	})
 
 	return nil, outerErr
-}
-
-func isHTTPHeader(named *types.Named) bool {
-	return named.Obj() != nil &&
-		named.Obj().Pkg() != nil &&
-		named.Obj().Pkg().Path() == pkgPath &&
-		named.Obj().Name() == name
 }
 
 func isValidMethod(name string) bool {
