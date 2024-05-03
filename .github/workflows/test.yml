@@ -10,11 +10,18 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        go-version: ['stable', 'oldstable', tip]
+        go-version: ['stable', 'oldstable', 'tip']
+        os: ['macos-latest', 'windows-latest', 'ubuntu-latest']
+        exclude:
+          - go-version: tip
+            os: macos-latest
+
+          - go-version: tip
+            os: windows-latest
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Install Go stable
