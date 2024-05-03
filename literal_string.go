@@ -19,27 +19,27 @@ type literalString struct {
 
 func newLiteralString(basicList *ast.BasicLit) (literalString, error) {
 	if basicList.Kind != token.STRING {
-		return literalString{}, fmt.Errorf("%#v is not string", basicList)
+		return literalString{}, fmt.Errorf("%#v is not a string", basicList)
 	}
 
 	if len(basicList.Value) < 2 {
-		return literalString{}, fmt.Errorf("%#v has strange length of value %q", basicList, basicList.Value)
+		return literalString{}, fmt.Errorf("%#v has a strange value length %q", basicList, basicList.Value)
 	}
 
 	quote := basicList.Value[0]
 	switch quote {
 	case '`', '"':
 	default:
-		return literalString{}, fmt.Errorf("%q is strange quote", quote)
+		return literalString{}, fmt.Errorf("%q is a strange quote", quote)
 	}
 
 	originalValue, err := strconv.Unquote(basicList.Value)
 	if err != nil {
-		return literalString{}, fmt.Errorf("can't unqoute %q: %w", basicList.Value, err)
+		return literalString{}, fmt.Errorf("unqoute %q: %w", basicList.Value, err)
 	}
 
 	if !utf8.ValidString(originalValue) {
-		return literalString{}, fmt.Errorf("%#v is not valid string", basicList.Value)
+		return literalString{}, fmt.Errorf("%#v is not a valid utf8 string", basicList.Value)
 	}
 
 	return literalString{

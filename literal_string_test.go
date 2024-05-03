@@ -18,7 +18,7 @@ func TestNewLiteral(t *testing.T) {
 		{
 			name:  "wrong_utf8",
 			value: `"\xF4\x00"`,
-			err:   `"\"\\xF4\\x00\"" is not valid string`,
+			err:   `"\"\\xF4\\x00\"" is not a valid utf8 string`,
 		},
 	} {
 		tt := tt

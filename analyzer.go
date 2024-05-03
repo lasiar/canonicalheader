@@ -88,7 +88,7 @@ func run(pass *analysis.Pass) (any, error) {
 			return
 		}
 
-		// Search by knows methods, where the key is first arg.
+		// Search for known methods where the key is the first arg.
 		if !isValidMethod(astcast.ToSelectorExpr(callExp.Fun).Sel.Name) {
 			return
 		}
