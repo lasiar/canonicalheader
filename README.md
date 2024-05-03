@@ -7,6 +7,15 @@
 
 Golang linter for check canonical header.
 
+### Install
+
+```shell
+go install -v github.com/lasiar/canonicalheader/cmd/canonicalheader@latest 
+```
+
+Or download the binary file from the [release](https://github.com/lasiar/canonicalheader/releases/latest).
+
+
 ### Example
 
 before
