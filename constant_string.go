@@ -21,7 +21,7 @@ type constantString struct {
 func newConstantKey(info *types.Info, ident *ast.Ident) (constantString, error) {
 	c, ok := info.ObjectOf(ident).(*types.Const)
 	if !ok {
-		return constantString{}, fmt.Errorf("type; %T not support", c)
+		return constantString{}, fmt.Errorf("type %T is not support", c)
 	}
 
 	return constantString{
