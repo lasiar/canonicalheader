@@ -35,7 +35,7 @@ func newLiteralString(basicList *ast.BasicLit) (literalString, error) {
 
 	originalValue, err := strconv.Unquote(basicList.Value)
 	if err != nil {
-		return literalString{}, fmt.Errorf("unqoute %q: %w", basicList.Value, err)
+		return literalString{}, fmt.Errorf("unquote %q: %w", basicList.Value, err)
 	}
 
 	if !utf8.ValidString(originalValue) {
