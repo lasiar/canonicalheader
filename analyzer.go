@@ -83,7 +83,7 @@ func run(pass *analysis.Pass) (any, error) {
 			return
 		}
 
-		// It is not net/http.Header{}
+		// It is not net/http.Header{}.
 		if !types.Identical(recv.Type(), headerObject.Type()) {
 			return
 		}
@@ -103,7 +103,7 @@ func run(pass *analysis.Pass) (any, error) {
 
 		// Check for type casting from myString to string.
 		// it could be: Get(string(string(string(myString)))).
-		// need this node------------------------^^^^^^^^
+		// need this node------------------------^^^^^^^^.
 		for {
 			// If it is not *ast.CallExpr, this is a value.
 			c, ok := callArg.(*ast.CallExpr)

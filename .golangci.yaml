@@ -717,6 +717,9 @@ linters-settings:
       - rangeExprCopy
       - rangeValCopy
 
+  godot:
+    scope: all
+
   errcheck:
     # Report `a := b.(MyStruct)` when `a, ok := ...` should be.
     check-type-assertions: true # Default: false
