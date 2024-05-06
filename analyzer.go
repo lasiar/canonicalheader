@@ -66,30 +66,94 @@ func run(pass *analysis.Pass) (any, error) {
 			return
 		}
 
-		fn, ok := typeutil.Callee(pass.TypesInfo, callExp).(*types.Func)
-		if !ok {
-			return
-		}
+		var (
+			// gotType type receiver.
+			gotType       types.Type
+			gotMethodName string
+		)
 
-		// Find net/http.Header{} by function call.
-		signature, ok := fn.Type().(*types.Signature)
-		if !ok {
-			return
-		}
+		switch t := typeutil.Callee(pass.TypesInfo, callExp).(type) {
+		// Direct call method.
+		case *types.Func:
+			fn := t
+			// Find net/http.Header{} by function call.
+			signature, ok := fn.Type().(*types.Signature)
+			if !ok {
+				return
+			}
 
-		recv := signature.Recv()
-		// It's a func, not a method.
-		if recv == nil {
+			recv := signature.Recv()
+
+			// It's a func, not a method.
+			if recv == nil {
+				return
+			}
+			gotType = recv.Type()
+			gotMethodName = astcast.ToSelectorExpr(callExp.Fun).Sel.Name
+
+		// h := http.Header{}
+		// f := h.Get
+		// v("Test-Value").
+		case *types.Var:
+			ident, ok := callExp.Fun.(*ast.Ident)
+			if !ok {
+				return
+			}
+
+			if ident.Obj == nil {
+				return
+			}
+
+			// f := h.Get.
+			assign, ok := ident.Obj.Decl.(*ast.AssignStmt)
+			if !ok {
+				return
+			}
+
+			// For case `i, v := 0, h.Get`.
+			// indexAssign--^.
+			indexAssign := -1
+			for i, lh := range assign.Lhs {
+				// Find by name of variable.
+				if astcast.ToIdent(lh).Name == ident.Name {
+					indexAssign = i
+				}
+			}
+
+			// Not found.
+			if indexAssign == -1 {
+				return
+			}
+
+			if len(assign.Rhs) <= indexAssign {
+				return
+			}
+
+			sel, ok := assign.Rhs[indexAssign].(*ast.SelectorExpr)
+			if !ok {
+				return
+			}
+
+			gotMethodName = sel.Sel.Name
+			ident, ok = sel.X.(*ast.Ident)
+			if !ok {
+				return
+			}
+
+			obj := pass.TypesInfo.ObjectOf(ident)
+			gotType = obj.Type()
+
+		default:
 			return
 		}
 
 		// It is not net/http.Header{}.
-		if !types.Identical(recv.Type(), headerObject.Type()) {
+		if !types.Identical(gotType, headerObject.Type()) {
 			return
 		}
 
 		// Search for known methods where the key is the first arg.
-		if !isValidMethod(astcast.ToSelectorExpr(callExp.Fun).Sel.Name) {
+		if !isValidMethod(gotMethodName) {
 			return
 		}
 

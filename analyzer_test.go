@@ -19,6 +19,7 @@ func TestAnalyzer(t *testing.T) {
 
 	testCases := [...]string{
 		"alias",
+		"assigned",
 		"common",
 		"const",
 		"embedded",
