@@ -2,9 +2,13 @@ name: test
 
 on:
   push:
-    branches: [main]
+    branches:
+      - 'main'
+      - 'v*'
   pull_request:
-    branches: [main]
+    branches:
+      - 'main'
+      - 'v*'
   schedule:
     - cron: '0 8 * * 1' # run "At 08:00 on Monday"ma
 

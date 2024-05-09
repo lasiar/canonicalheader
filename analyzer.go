@@ -51,6 +51,8 @@ func run(pass *analysis.Pass) (any, error) {
 		return nil, fmt.Errorf("want %T, got %T", spctor, pass.ResultOf[inspect.Analyzer])
 	}
 
+	wellKnownHeaders := initialism()
+
 	nodeFilter := []ast.Node{
 		(*ast.CallExpr)(nil),
 	}
@@ -230,10 +232,26 @@ func run(pass *analysis.Pass) (any, error) {
 			return
 		}
 
+		headerKeyCanonical, isWellKnown := canonicalHeaderKey(argValue, wellKnownHeaders)
+		if argValue == headerKeyCanonical || isWellKnown {
+			return
+		}
+
 		pass.Report(arg.diagnostic(headerKeyCanonical))
 	})
 
 	return nil, outerErr
+}
+
+func canonicalHeaderKey(s string, m map[string]string) (string, bool) {
+	canonical := http.CanonicalHeaderKey(s)
+
+	wellKnown, ok := m[canonical]
+	if !ok {
+		return canonical, ok
+	}
+
+	return wellKnown, ok
 }
 
 func isValidMethod(name string) bool {

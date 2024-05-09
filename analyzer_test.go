@@ -24,6 +24,7 @@ func TestAnalyzer(t *testing.T) {
 		"const",
 		"embedded",
 		"global",
+		"initialism",
 		"struct",
 		"underlying",
 	}
