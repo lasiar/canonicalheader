@@ -34,6 +34,8 @@ func run(pass *analysis.Pass) (any, error) {
 		return nil, fmt.Errorf("want %T, got %T", spctor, pass.ResultOf[inspect.Analyzer])
 	}
 
+	wellKnownHeaders := initialism()
+
 	nodeFilter := []ast.Node{
 		(*ast.CallExpr)(nil),
 	}
@@ -97,8 +99,8 @@ func run(pass *analysis.Pass) (any, error) {
 			return
 		}
 
-		headerKeyCanonical := http.CanonicalHeaderKey(headerKeyOriginal)
-		if headerKeyOriginal == headerKeyCanonical {
+		headerKeyCanonical, isWellKnown := canonicalHeaderKey(headerKeyOriginal, wellKnownHeaders)
+		if headerKeyOriginal == headerKeyCanonical || isWellKnown {
 			return
 		}
 
@@ -129,6 +131,17 @@ func run(pass *analysis.Pass) (any, error) {
 	})
 
 	return nil, outerErr
+}
+
+func canonicalHeaderKey(s string, m map[string]string) (string, bool) {
+	canonical := http.CanonicalHeaderKey(s)
+
+	wellKnown, ok := m[canonical]
+	if !ok {
+		return canonical, ok
+	}
+
+	return wellKnown, ok
 }
 
 func isHTTPHeader(named *types.Named) bool {

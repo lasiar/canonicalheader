@@ -22,6 +22,7 @@ func TestAnalyzer(t *testing.T) {
 		"common",
 		"embedded",
 		"global",
+		"initialism",
 		"struct",
 	}
 
