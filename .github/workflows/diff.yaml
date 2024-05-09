@@ -2,14 +2,16 @@ name: check diff
 
 on:
   push:
-    tags:
-      - '*'
-
-permissions:
-  contents: write
+    branches:
+      - 'main'
+      - 'v*'
+  pull_request:
+    branches:
+      - 'main'
+      - 'v*'
 
 jobs:
-  goreleaser:
+  check_diff:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,7 +25,7 @@ jobs:
           go-version: stable
           check-latest: true
 
-      - name: Generate test
+      - name: Generate
         run: |
           make generate
 
