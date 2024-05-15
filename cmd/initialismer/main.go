@@ -11,6 +11,7 @@ import (
 	"slices"
 )
 
+//nolint:gochecknoglobals // this map no allocate at golangci-lint
 var mustBeIgnore = [...]string{
 	"A-IM",
 	"Accept",
