@@ -37,13 +37,10 @@ jobs:
       - name: Install Go tip
         if: matrix.go-version == 'tip'
         run: |
-          curl -sL https://storage.googleapis.com/go-build-snap/go/linux-amd64/$(git ls-remote https://github.com/golang/go.git HEAD | awk '{print $1;}').tar.gz -o gotip.tar.gz
-          ls -lah gotip.tar.gz
-          mkdir -p ~/sdk/gotip
-          tar -C ~/sdk/gotip -xzf gotip.tar.gz
+          go install golang.org/dl/gotip@latest
+          $HOME/go/bin/gotip download
           ~/sdk/gotip/bin/go version
           echo "PATH=$HOME/go/bin:$HOME/sdk/gotip/bin/:$PATH" >> $GITHUB_ENV
-          go version
 
       - name: Cache
         uses: actions/cache@v4
