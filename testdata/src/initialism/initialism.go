@@ -6,69 +6,69 @@ import "net/http"
 func _() {
 	h := http.Header{}
 
-	h.Get("A-IM")
-	h.Get("Accept-CH")
-	h.Get("ALPN")
-	h.Get("AMP-Cache-Transform")
-	h.Get("C-PEP")
-	h.Get("C-PEP-Info")
-	h.Get("Cal-Managed-ID")
-	h.Get("CalDAV-Timezones")
-	h.Get("CDN-Cache-Control")
-	h.Get("CDN-Loop")
-	h.Get("Content-ID")
-	h.Get("Content-MD5")
-	h.Get("DASL")
-	h.Get("DAV")
-	h.Get("Differential-ID")
-	h.Get("DNT")
-	h.Get("DPoP")
-	h.Get("DPoP-Nonce")
-	h.Get("EDIINT-Features")
-	h.Get("ETag")
-	h.Get("Expect-CT")
-	h.Get("GetProfile")
-	h.Get("HTTP2-Settings")
-	h.Get("IM")
-	h.Get("Include-Referred-Token-Binding-ID")
-	h.Get("Last-Event-ID")
-	h.Get("MIME-Version")
-	h.Get("NEL")
-	h.Get("OData-EntityId")
-	h.Get("OData-Isolation")
-	h.Get("OData-MaxVersion")
-	h.Get("OData-Version")
-	h.Get("Optional-WWW-Authenticate")
-	h.Get("OSCORE")
-	h.Get("OSLC-Core-Version")
-	h.Get("P3P")
-	h.Get("PEP")
-	h.Get("PEP-Info")
-	h.Get("PICS-Label")
-	h.Get("ProfileObject")
-	h.Get("Repeatability-Client-ID")
-	h.Get("Repeatability-Request-ID")
-	h.Get("Sec-GPC")
-	h.Get("Sec-WebSocket-Accept")
-	h.Get("Sec-WebSocket-Extensions")
-	h.Get("Sec-WebSocket-Key")
-	h.Get("Sec-WebSocket-Protocol")
-	h.Get("Sec-WebSocket-Version")
-	h.Get("SetProfile")
-	h.Get("SLUG")
-	h.Get("SoapAction")
-	h.Get("Status-URI")
-	h.Get("TCN")
-	h.Get("TE")
-	h.Get("TTL")
-	h.Get("URI")
-	h.Get("WWW-Authenticate")
-	h.Get("X-Correlation-ID")
-	h.Get("X-DNS-Prefetch-Control")
-	h.Get("X-Real-IP")
-	h.Get("X-Request-ID")
-	h.Get("X-UA-Compatible")
-	h.Get("X-WebKit-CSP")
-	h.Get("X-XSS")
-	h.Get("X-XSS-Protection")
+	h.Get("A-Im")                              // want `initialism header "A-Im", instead use: "A-IM"`
+	h.Get("Accept-Ch")                         // want `initialism header "Accept-Ch", instead use: "Accept-CH"`
+	h.Get("Alpn")                              // want `initialism header "Alpn", instead use: "ALPN"`
+	h.Get("Amp-Cache-Transform")               // want `initialism header "Amp-Cache-Transform", instead use: "AMP-Cache-Transform"`
+	h.Get("C-Pep")                             // want `initialism header "C-Pep", instead use: "C-PEP"`
+	h.Get("C-Pep-Info")                        // want `initialism header "C-Pep-Info", instead use: "C-PEP-Info"`
+	h.Get("Cal-Managed-Id")                    // want `initialism header "Cal-Managed-Id", instead use: "Cal-Managed-ID"`
+	h.Get("Caldav-Timezones")                  // want `initialism header "Caldav-Timezones", instead use: "CalDAV-Timezones"`
+	h.Get("Cdn-Cache-Control")                 // want `initialism header "Cdn-Cache-Control", instead use: "CDN-Cache-Control"`
+	h.Get("Cdn-Loop")                          // want `initialism header "Cdn-Loop", instead use: "CDN-Loop"`
+	h.Get("Content-Id")                        // want `initialism header "Content-Id", instead use: "Content-ID"`
+	h.Get("Content-Md5")                       // want `initialism header "Content-Md5", instead use: "Content-MD5"`
+	h.Get("Dasl")                              // want `initialism header "Dasl", instead use: "DASL"`
+	h.Get("Dav")                               // want `initialism header "Dav", instead use: "DAV"`
+	h.Get("Differential-Id")                   // want `initialism header "Differential-Id", instead use: "Differential-ID"`
+	h.Get("Dnt")                               // want `initialism header "Dnt", instead use: "DNT"`
+	h.Get("Dpop")                              // want `initialism header "Dpop", instead use: "DPoP"`
+	h.Get("Dpop-Nonce")                        // want `initialism header "Dpop-Nonce", instead use: "DPoP-Nonce"`
+	h.Get("Ediint-Features")                   // want `initialism header "Ediint-Features", instead use: "EDIINT-Features"`
+	h.Get("Etag")                              // want `initialism header "Etag", instead use: "ETag"`
+	h.Get("Expect-Ct")                         // want `initialism header "Expect-Ct", instead use: "Expect-CT"`
+	h.Get("Getprofile")                        // want `initialism header "Getprofile", instead use: "GetProfile"`
+	h.Get("Http2-Settings")                    // want `initialism header "Http2-Settings", instead use: "HTTP2-Settings"`
+	h.Get("Im")                                // want `initialism header "Im", instead use: "IM"`
+	h.Get("Include-Referred-Token-Binding-Id") // want `initialism header "Include-Referred-Token-Binding-Id", instead use: "Include-Referred-Token-Binding-ID"`
+	h.Get("Last-Event-Id")                     // want `initialism header "Last-Event-Id", instead use: "Last-Event-ID"`
+	h.Get("Mime-Version")                      // want `initialism header "Mime-Version", instead use: "MIME-Version"`
+	h.Get("Nel")                               // want `initialism header "Nel", instead use: "NEL"`
+	h.Get("Odata-Entityid")                    // want `initialism header "Odata-Entityid", instead use: "OData-EntityId"`
+	h.Get("Odata-Isolation")                   // want `initialism header "Odata-Isolation", instead use: "OData-Isolation"`
+	h.Get("Odata-Maxversion")                  // want `initialism header "Odata-Maxversion", instead use: "OData-MaxVersion"`
+	h.Get("Odata-Version")                     // want `initialism header "Odata-Version", instead use: "OData-Version"`
+	h.Get("Optional-Www-Authenticate")         // want `initialism header "Optional-Www-Authenticate", instead use: "Optional-WWW-Authenticate"`
+	h.Get("Oscore")                            // want `initialism header "Oscore", instead use: "OSCORE"`
+	h.Get("Oslc-Core-Version")                 // want `initialism header "Oslc-Core-Version", instead use: "OSLC-Core-Version"`
+	h.Get("P3p")                               // want `initialism header "P3p", instead use: "P3P"`
+	h.Get("Pep")                               // want `initialism header "Pep", instead use: "PEP"`
+	h.Get("Pep-Info")                          // want `initialism header "Pep-Info", instead use: "PEP-Info"`
+	h.Get("Pics-Label")                        // want `initialism header "Pics-Label", instead use: "PICS-Label"`
+	h.Get("Profileobject")                     // want `initialism header "Profileobject", instead use: "ProfileObject"`
+	h.Get("Repeatability-Client-Id")           // want `initialism header "Repeatability-Client-Id", instead use: "Repeatability-Client-ID"`
+	h.Get("Repeatability-Request-Id")          // want `initialism header "Repeatability-Request-Id", instead use: "Repeatability-Request-ID"`
+	h.Get("Sec-Gpc")                           // want `initialism header "Sec-Gpc", instead use: "Sec-GPC"`
+	h.Get("Sec-Websocket-Accept")              // want `initialism header "Sec-Websocket-Accept", instead use: "Sec-WebSocket-Accept"`
+	h.Get("Sec-Websocket-Extensions")          // want `initialism header "Sec-Websocket-Extensions", instead use: "Sec-WebSocket-Extensions"`
+	h.Get("Sec-Websocket-Key")                 // want `initialism header "Sec-Websocket-Key", instead use: "Sec-WebSocket-Key"`
+	h.Get("Sec-Websocket-Protocol")            // want `initialism header "Sec-Websocket-Protocol", instead use: "Sec-WebSocket-Protocol"`
+	h.Get("Sec-Websocket-Version")             // want `initialism header "Sec-Websocket-Version", instead use: "Sec-WebSocket-Version"`
+	h.Get("Setprofile")                        // want `initialism header "Setprofile", instead use: "SetProfile"`
+	h.Get("Slug")                              // want `initialism header "Slug", instead use: "SLUG"`
+	h.Get("Soapaction")                        // want `initialism header "Soapaction", instead use: "SoapAction"`
+	h.Get("Status-Uri")                        // want `initialism header "Status-Uri", instead use: "Status-URI"`
+	h.Get("Tcn")                               // want `initialism header "Tcn", instead use: "TCN"`
+	h.Get("Te")                                // want `initialism header "Te", instead use: "TE"`
+	h.Get("Ttl")                               // want `initialism header "Ttl", instead use: "TTL"`
+	h.Get("Uri")                               // want `initialism header "Uri", instead use: "URI"`
+	h.Get("Www-Authenticate")                  // want `initialism header "Www-Authenticate", instead use: "WWW-Authenticate"`
+	h.Get("X-Correlation-Id")                  // want `initialism header "X-Correlation-Id", instead use: "X-Correlation-ID"`
+	h.Get("X-Dns-Prefetch-Control")            // want `initialism header "X-Dns-Prefetch-Control", instead use: "X-DNS-Prefetch-Control"`
+	h.Get("X-Real-Ip")                         // want `initialism header "X-Real-Ip", instead use: "X-Real-IP"`
+	h.Get("X-Request-Id")                      // want `initialism header "X-Request-Id", instead use: "X-Request-ID"`
+	h.Get("X-Ua-Compatible")                   // want `initialism header "X-Ua-Compatible", instead use: "X-UA-Compatible"`
+	h.Get("X-Webkit-Csp")                      // want `initialism header "X-Webkit-Csp", instead use: "X-WebKit-CSP"`
+	h.Get("X-Xss")                             // want `initialism header "X-Xss", instead use: "X-XSS"`
+	h.Get("X-Xss-Protection")                  // want `initialism header "X-Xss-Protection", instead use: "X-XSS-Protection"`
 }

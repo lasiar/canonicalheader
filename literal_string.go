@@ -50,7 +50,7 @@ func newLiteralString(basicList *ast.BasicLit) (literalString, error) {
 	}, nil
 }
 
-func (l literalString) diagnostic(canonicalHeader string) analysis.Diagnostic {
+func (l literalString) diagnostic(canonicalHeader string, r reasonReport) analysis.Diagnostic {
 	newText := make([]byte, 0, len(canonicalHeader)+2)
 	newText = append(newText, l.quote)
 	newText = append(newText, unsafe.Slice(unsafe.StringData(canonicalHeader), len(canonicalHeader))...)
@@ -59,7 +59,7 @@ func (l literalString) diagnostic(canonicalHeader string) analysis.Diagnostic {
 	return analysis.Diagnostic{
 		Pos:     l.pos,
 		End:     l.end,
-		Message: fmt.Sprintf("non-canonical header %q, instead use: %q", l.originalValue, canonicalHeader),
+		Message: fmt.Sprintf("%s header %q, instead use: %q", r, l.originalValue, canonicalHeader),
 		SuggestedFixes: []analysis.SuggestedFix{
 			{
 				Message: fmt.Sprintf("should replace %q with %q", l.originalValue, canonicalHeader),
