@@ -1,5 +1,5 @@
 package global
 
 func dontImportPackage() {
-	header.Get("Test-HEader") // want `non-canonical header "Test-HEader", instead use: "Test-Header"`
+	header.Get("Test-HEader") // want `use "Test-Header" instead of "Test-HEader"`
 }

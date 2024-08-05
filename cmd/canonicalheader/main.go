@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	singlechecker.Main(canonicalheader.Analyzer)
+	singlechecker.Main(canonicalheader.New())
 }

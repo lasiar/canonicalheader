@@ -10,8 +10,8 @@ func _() {
 
 	i, g := 0, h.Del
 	fmt.Println(i)
-	g("TT") // want `non-canonical header "TT", instead use: "Tt"`
+	g("TT") // want `use "Tt" instead of "TT"`
 
 	f := h.Get
-	f("TT") // want `non-canonical header "TT", instead use: "Tt"`
+	f("TT") // want `use "Tt" instead of "TT"`
 }

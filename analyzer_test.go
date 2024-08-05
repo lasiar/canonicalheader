@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/analysistest"
 
 	"github.com/lasiar/canonicalheader"
@@ -17,27 +18,48 @@ const testValue = "hello_world"
 func TestAnalyzer(t *testing.T) {
 	t.Parallel()
 
-	testCases := [...]string{
-		"alias",
-		"assigned",
-		"common",
-		"const",
-		"embedded",
-		"global",
-		"initialism",
-		"struct",
-		"underlying",
+	testCases := [...]struct {
+		pkg            string
+		customAnalyzer func(t *testing.T) *analysis.Analyzer
+	}{
+		{pkg: "alias"},
+		{pkg: "assigned"},
+		{pkg: "common"},
+		{pkg: "const"},
+		{pkg: "embedded"},
+		{
+			pkg: "exclusions",
+			customAnalyzer: func(t *testing.T) *analysis.Analyzer {
+				t.Helper()
+
+				a := canonicalheader.New()
+				err := a.Flags.Set("exclusions", "exclusioN")
+				require.NoError(t, err)
+				return a
+			},
+		},
+		{pkg: "global"},
+		{pkg: "initialism"},
+		{pkg: "struct"},
+		{pkg: "underlying"},
 	}
 
 	for _, tt := range testCases {
-		t.Run(tt, func(t *testing.T) {
+		t.Run(tt.pkg, func(t *testing.T) {
 			t.Parallel()
+
+			var a *analysis.Analyzer
+			if tt.customAnalyzer != nil {
+				a = tt.customAnalyzer(t)
+			} else {
+				a = canonicalheader.New()
+			}
 
 			analysistest.RunWithSuggestedFixes(
 				t,
 				analysistest.TestData(),
-				canonicalheader.Analyzer,
-				tt,
+				a,
+				tt.pkg,
 			)
 		})
 	}
@@ -45,16 +67,21 @@ func TestAnalyzer(t *testing.T) {
 	t.Run("are_test_cases_complete", func(t *testing.T) {
 		t.Parallel()
 
-		dirs, err := os.ReadDir(filepath.Join(analysistest.TestData(), "src"))
+		want, err := os.ReadDir(filepath.Join(analysistest.TestData(), "src"))
 		require.NoError(t, err)
-		require.Len(t, testCases, len(dirs))
+		require.Len(t, testCases, len(want))
+
+		got := [len(testCases)]string{}
+		for i, testCase := range testCases {
+			got[i] = testCase.pkg
+		}
 
 		require.EqualValues(
 			t,
-			transform(dirs, func(d os.DirEntry) string {
+			transform(want, func(d os.DirEntry) string {
 				return d.Name()
 			}),
-			testCases,
+			got,
 		)
 	})
 }

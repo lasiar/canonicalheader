@@ -7,9 +7,9 @@ type HeaderStruct struct {
 }
 
 func (h HeaderStruct) _() {
-	h.header.Get("TT") // want `non-canonical header "TT", instead use: "Tt"`
+	h.header.Get("TT") // want `use "Tt" instead of "TT"`
 }
 
 func _() {
-	HeaderStruct{}.header.Get("TT") // want `non-canonical header "TT", instead use: "Tt"`
+	HeaderStruct{}.header.Get("TT") // want `use "Tt" instead of "TT"`
 }
