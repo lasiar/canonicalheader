@@ -1,6 +1,7 @@
 package canonicalheader
 
 import (
+	"flag"
 	"fmt"
 	"go/ast"
 	"go/types"
@@ -19,19 +20,87 @@ const (
 )
 
 //nolint:gochecknoglobals // struct is not big, can be skip.
-var Analyzer = &analysis.Analyzer{
-	Name:     "canonicalheader",
-	Doc:      "canonicalheader checks whether net/http.Header uses canonical header",
-	Run:      run,
-	Requires: []*analysis.Analyzer{inspect.Analyzer},
+var Analyzer = New()
+
+func New() *analysis.Analyzer {
+	c := &canonicalHeader{}
+
+	a := &analysis.Analyzer{
+		Name:     "canonicalheader",
+		Doc:      "canonicalheader checks whether net/http.Header uses canonical header",
+		Requires: []*analysis.Analyzer{inspect.Analyzer},
+		Run:      c.run,
+	}
+
+	a.Flags.Init("canonicalheader", flag.ExitOnError)
+	a.Flags.Var(&c.exclusions, "exclusions", "comma-separated list of exclusion rules")
+	a.Flags.BoolVar(&c.useDefaultExclusion, "useDefaultExclusion", true, "use default exclusion rules")
+
+	return a
+}
+
+type canonicalHeader struct {
+	useDefaultExclusion bool
+	exclusions          stringSet
+}
+
+type reasonReport uint8
+
+const (
+	reasonReportNonCanonical = iota + 1
+	reasonReportExclusion
+	reasonReportInitialism
+)
+
+func (r reasonReport) String() string {
+	switch r {
+	case reasonReportNonCanonical:
+		return "non-canonical"
+
+	case reasonReportExclusion:
+		return "exclusion"
+
+	case reasonReportInitialism:
+		return "initialism"
+
+	default:
+		return "unknown"
+	}
 }
 
 type argumenter interface {
-	diagnostic(canonicalHeader string) analysis.Diagnostic
+	diagnostic(canonicalHeader string, r reasonReport) analysis.Diagnostic
 	value() string
 }
 
-func run(pass *analysis.Pass) (any, error) {
+type wellKnownHeader struct {
+	header string
+	reason reasonReport
+}
+
+func (c *canonicalHeader) buildExclusions() map[string]wellKnownHeader {
+	result := make(map[string]wellKnownHeader)
+
+	if c.useDefaultExclusion {
+		for canonical, noCanonical := range initialism() {
+			result[canonical] = wellKnownHeader{
+				header: noCanonical,
+				reason: reasonReportInitialism,
+			}
+		}
+	}
+
+	for _, ex := range c.exclusions {
+		result[http.CanonicalHeaderKey(ex)] = wellKnownHeader{
+			header: ex,
+			reason: reasonReportExclusion,
+		}
+	}
+
+	return result
+}
+
+func (c *canonicalHeader) run(pass *analysis.Pass) (any, error) {
 	var headerObject types.Object
 	for _, object := range pass.TypesInfo.Uses {
 		if object.Pkg() != nil &&
@@ -52,7 +121,7 @@ func run(pass *analysis.Pass) (any, error) {
 		return nil, fmt.Errorf("want %T, got %T", spctor, pass.ResultOf[inspect.Analyzer])
 	}
 
-	wellKnownHeaders := initialism()
+	exclusions := c.buildExclusions()
 
 	nodeFilter := []ast.Node{
 		(*ast.CallExpr)(nil),
@@ -228,31 +297,27 @@ func run(pass *analysis.Pass) (any, error) {
 		}
 
 		argValue := arg.value()
-		headerKeyCanonical := http.CanonicalHeaderKey(argValue)
+
+		headerKeyCanonical, reason := canonicalHeaderKey(argValue, exclusions)
 		if argValue == headerKeyCanonical {
 			return
 		}
 
-		headerKeyCanonical, isWellKnown := canonicalHeaderKey(argValue, wellKnownHeaders)
-		if argValue == headerKeyCanonical || isWellKnown {
-			return
-		}
-
-		pass.Report(arg.diagnostic(headerKeyCanonical))
+		pass.Report(arg.diagnostic(headerKeyCanonical, reason))
 	})
 
 	return nil, outerErr
 }
 
-func canonicalHeaderKey(s string, m map[string]string) (string, bool) {
+func canonicalHeaderKey(s string, m map[string]wellKnownHeader) (string, reasonReport) {
 	canonical := http.CanonicalHeaderKey(s)
 
 	wellKnown, ok := m[canonical]
 	if !ok {
-		return canonical, ok
+		return canonical, reasonReportNonCanonical
 	}
 
-	return wellKnown, ok
+	return wellKnown.header, wellKnown.reason
 }
 
 func isValidMethod(name string) bool {

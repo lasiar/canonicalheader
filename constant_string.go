@@ -32,14 +32,15 @@ func newConstantKey(info *types.Info, ident *ast.Ident) (constantString, error) 
 	}, nil
 }
 
-func (c constantString) diagnostic(canonicalHeader string) analysis.Diagnostic {
+func (c constantString) diagnostic(canonicalHeader string, r reasonReport) analysis.Diagnostic {
 	return analysis.Diagnostic{
 		Pos: c.pos,
 		End: c.end,
 		Message: fmt.Sprintf(
-			"const %q used as a key at http.Header, but %q is not canonical, want %q",
+			"const %q used as a key at http.Header, but %q is %s, want %q",
 			c.nameOfConst,
 			c.originalValue,
+			r,
 			canonicalHeader,
 		),
 	}

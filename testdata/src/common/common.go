@@ -8,7 +8,7 @@ const testHeader = "testHeader"
 
 func p() {
 	v := http.Header{}
-	v.Get(testHeader) // want `const "testHeader" used as a key at http.Header, but "testHeader" is not canonical, want "Testheader"`
+	v.Get(testHeader) // want `const "testHeader" used as a key at http.Header, but "testHeader" is non-canonical, want "Testheader"`
 
 	v.Get("Test-HEader")           // want `non-canonical header "Test-HEader", instead use: "Test-Header"`
 	v.Set("Test-HEader", "value")  // want `non-canonical header "Test-HEader", instead use: "Test-Header"`
