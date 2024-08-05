@@ -6,69 +6,69 @@ import "net/http"
 func _() {
 	h := http.Header{}
 
-	h.Get("A-IM")
-	h.Get("Accept-CH")
-	h.Get("ALPN")
-	h.Get("AMP-Cache-Transform")
-	h.Get("C-PEP")
-	h.Get("C-PEP-Info")
-	h.Get("Cal-Managed-ID")
-	h.Get("CalDAV-Timezones")
-	h.Get("CDN-Cache-Control")
-	h.Get("CDN-Loop")
-	h.Get("Content-ID")
-	h.Get("Content-MD5")
-	h.Get("DASL")
-	h.Get("DAV")
-	h.Get("Differential-ID")
-	h.Get("DNT")
-	h.Get("DPoP")
-	h.Get("DPoP-Nonce")
-	h.Get("EDIINT-Features")
-	h.Get("ETag")
-	h.Get("Expect-CT")
-	h.Get("GetProfile")
-	h.Get("HTTP2-Settings")
-	h.Get("IM")
-	h.Get("Include-Referred-Token-Binding-ID")
-	h.Get("Last-Event-ID")
-	h.Get("MIME-Version")
-	h.Get("NEL")
-	h.Get("OData-EntityId")
-	h.Get("OData-Isolation")
-	h.Get("OData-MaxVersion")
-	h.Get("OData-Version")
-	h.Get("Optional-WWW-Authenticate")
-	h.Get("OSCORE")
-	h.Get("OSLC-Core-Version")
-	h.Get("P3P")
-	h.Get("PEP")
-	h.Get("PEP-Info")
-	h.Get("PICS-Label")
-	h.Get("ProfileObject")
-	h.Get("Repeatability-Client-ID")
-	h.Get("Repeatability-Request-ID")
-	h.Get("Sec-GPC")
-	h.Get("Sec-WebSocket-Accept")
-	h.Get("Sec-WebSocket-Extensions")
-	h.Get("Sec-WebSocket-Key")
-	h.Get("Sec-WebSocket-Protocol")
-	h.Get("Sec-WebSocket-Version")
-	h.Get("SetProfile")
-	h.Get("SLUG")
-	h.Get("SoapAction")
-	h.Get("Status-URI")
-	h.Get("TCN")
-	h.Get("TE")
-	h.Get("TTL")
-	h.Get("URI")
-	h.Get("WWW-Authenticate")
-	h.Get("X-Correlation-ID")
-	h.Get("X-DNS-Prefetch-Control")
-	h.Get("X-Real-IP")
-	h.Get("X-Request-ID")
-	h.Get("X-UA-Compatible")
-	h.Get("X-WebKit-CSP")
-	h.Get("X-XSS")
-	h.Get("X-XSS-Protection")
+	h.Get("A-Im")                              // want `use "A-IM" instead of "A-Im"`
+	h.Get("Accept-Ch")                         // want `use "Accept-CH" instead of "Accept-Ch"`
+	h.Get("Alpn")                              // want `use "ALPN" instead of "Alpn"`
+	h.Get("Amp-Cache-Transform")               // want `use "AMP-Cache-Transform" instead of "Amp-Cache-Transform"`
+	h.Get("C-Pep")                             // want `use "C-PEP" instead of "C-Pep"`
+	h.Get("C-Pep-Info")                        // want `use "C-PEP-Info" instead of "C-Pep-Info"`
+	h.Get("Cal-Managed-Id")                    // want `use "Cal-Managed-ID" instead of "Cal-Managed-Id"`
+	h.Get("Caldav-Timezones")                  // want `use "CalDAV-Timezones" instead of "Caldav-Timezones"`
+	h.Get("Cdn-Cache-Control")                 // want `use "CDN-Cache-Control" instead of "Cdn-Cache-Control"`
+	h.Get("Cdn-Loop")                          // want `use "CDN-Loop" instead of "Cdn-Loop"`
+	h.Get("Content-Id")                        // want `use "Content-ID" instead of "Content-Id"`
+	h.Get("Content-Md5")                       // want `use "Content-MD5" instead of "Content-Md5"`
+	h.Get("Dasl")                              // want `use "DASL" instead of "Dasl"`
+	h.Get("Dav")                               // want `use "DAV" instead of "Dav"`
+	h.Get("Differential-Id")                   // want `use "Differential-ID" instead of "Differential-Id"`
+	h.Get("Dnt")                               // want `use "DNT" instead of "Dnt"`
+	h.Get("Dpop")                              // want `use "DPoP" instead of "Dpop"`
+	h.Get("Dpop-Nonce")                        // want `use "DPoP-Nonce" instead of "Dpop-Nonce"`
+	h.Get("Ediint-Features")                   // want `use "EDIINT-Features" instead of "Ediint-Features"`
+	h.Get("Etag")                              // want `use "ETag" instead of "Etag"`
+	h.Get("Expect-Ct")                         // want `use "Expect-CT" instead of "Expect-Ct"`
+	h.Get("Getprofile")                        // want `use "GetProfile" instead of "Getprofile"`
+	h.Get("Http2-Settings")                    // want `use "HTTP2-Settings" instead of "Http2-Settings"`
+	h.Get("Im")                                // want `use "IM" instead of "Im"`
+	h.Get("Include-Referred-Token-Binding-Id") // want `use "Include-Referred-Token-Binding-ID" instead of "Include-Referred-Token-Binding-Id"`
+	h.Get("Last-Event-Id")                     // want `use "Last-Event-ID" instead of "Last-Event-Id"`
+	h.Get("Mime-Version")                      // want `use "MIME-Version" instead of "Mime-Version"`
+	h.Get("Nel")                               // want `use "NEL" instead of "Nel"`
+	h.Get("Odata-Entityid")                    // want `use "OData-EntityId" instead of "Odata-Entityid"`
+	h.Get("Odata-Isolation")                   // want `use "OData-Isolation" instead of "Odata-Isolation"`
+	h.Get("Odata-Maxversion")                  // want `use "OData-MaxVersion" instead of "Odata-Maxversion"`
+	h.Get("Odata-Version")                     // want `use "OData-Version" instead of "Odata-Version"`
+	h.Get("Optional-Www-Authenticate")         // want `use "Optional-WWW-Authenticate" instead of "Optional-Www-Authenticate"`
+	h.Get("Oscore")                            // want `use "OSCORE" instead of "Oscore"`
+	h.Get("Oslc-Core-Version")                 // want `use "OSLC-Core-Version" instead of "Oslc-Core-Version"`
+	h.Get("P3p")                               // want `use "P3P" instead of "P3p"`
+	h.Get("Pep")                               // want `use "PEP" instead of "Pep"`
+	h.Get("Pep-Info")                          // want `use "PEP-Info" instead of "Pep-Info"`
+	h.Get("Pics-Label")                        // want `use "PICS-Label" instead of "Pics-Label"`
+	h.Get("Profileobject")                     // want `use "ProfileObject" instead of "Profileobject"`
+	h.Get("Repeatability-Client-Id")           // want `use "Repeatability-Client-ID" instead of "Repeatability-Client-Id"`
+	h.Get("Repeatability-Request-Id")          // want `use "Repeatability-Request-ID" instead of "Repeatability-Request-Id"`
+	h.Get("Sec-Gpc")                           // want `use "Sec-GPC" instead of "Sec-Gpc"`
+	h.Get("Sec-Websocket-Accept")              // want `use "Sec-WebSocket-Accept" instead of "Sec-Websocket-Accept"`
+	h.Get("Sec-Websocket-Extensions")          // want `use "Sec-WebSocket-Extensions" instead of "Sec-Websocket-Extensions"`
+	h.Get("Sec-Websocket-Key")                 // want `use "Sec-WebSocket-Key" instead of "Sec-Websocket-Key"`
+	h.Get("Sec-Websocket-Protocol")            // want `use "Sec-WebSocket-Protocol" instead of "Sec-Websocket-Protocol"`
+	h.Get("Sec-Websocket-Version")             // want `use "Sec-WebSocket-Version" instead of "Sec-Websocket-Version"`
+	h.Get("Setprofile")                        // want `use "SetProfile" instead of "Setprofile"`
+	h.Get("Slug")                              // want `use "SLUG" instead of "Slug"`
+	h.Get("Soapaction")                        // want `use "SoapAction" instead of "Soapaction"`
+	h.Get("Status-Uri")                        // want `use "Status-URI" instead of "Status-Uri"`
+	h.Get("Tcn")                               // want `use "TCN" instead of "Tcn"`
+	h.Get("Te")                                // want `use "TE" instead of "Te"`
+	h.Get("Ttl")                               // want `use "TTL" instead of "Ttl"`
+	h.Get("Uri")                               // want `use "URI" instead of "Uri"`
+	h.Get("Www-Authenticate")                  // want `use "WWW-Authenticate" instead of "Www-Authenticate"`
+	h.Get("X-Correlation-Id")                  // want `use "X-Correlation-ID" instead of "X-Correlation-Id"`
+	h.Get("X-Dns-Prefetch-Control")            // want `use "X-DNS-Prefetch-Control" instead of "X-Dns-Prefetch-Control"`
+	h.Get("X-Real-Ip")                         // want `use "X-Real-IP" instead of "X-Real-Ip"`
+	h.Get("X-Request-Id")                      // want `use "X-Request-ID" instead of "X-Request-Id"`
+	h.Get("X-Ua-Compatible")                   // want `use "X-UA-Compatible" instead of "X-Ua-Compatible"`
+	h.Get("X-Webkit-Csp")                      // want `use "X-WebKit-CSP" instead of "X-Webkit-Csp"`
+	h.Get("X-Xss")                             // want `use "X-XSS" instead of "X-Xss"`
+	h.Get("X-Xss-Protection")                  // want `use "X-XSS-Protection" instead of "X-Xss-Protection"`
 }

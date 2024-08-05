@@ -5,5 +5,5 @@ import "net/http"
 type myHeader = http.Header
 
 func _() {
-	myHeader{}.Get("Tt") // want `non-canonical header "TT", instead use: "Tt"`
+	myHeader{}.Get("Tt") // want `use "Tt" instead of "TT"`
 }

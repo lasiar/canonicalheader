@@ -4,18 +4,18 @@ import (
 	"net/http"
 )
 
-const testHeader = "testHeader"
+const constTestHeader = "testHeaderValue"
 
 func p() {
 	v := http.Header{}
-	v.Get(testHeader) // want `const "testHeader" used as a key at http.Header, but "testHeader" is not canonical, want "Testheader"`
+	v.Get(constTestHeader) // want `use "Testheadervalue" instead of "testHeaderValue"`
 
-	v.Get("Test-HEader")           // want `non-canonical header "Test-HEader", instead use: "Test-Header"`
-	v.Set("Test-HEader", "value")  // want `non-canonical header "Test-HEader", instead use: "Test-Header"`
-	v.Add("Test-HEader", "value")  // want `non-canonical header "Test-HEader", instead use: "Test-Header"`
-	v.Del("Test-HEader")           // want `non-canonical header "Test-HEader", instead use: "Test-Header"`
-	v.Values("Test-HEader")        // want `non-canonical header "Test-HEader", instead use: "Test-Header"`
-	v.Values(`Raw-STRING-Literal`) // want `non-canonical header "Raw-STRING-Literal", instead use: "Raw-String-Literal"`
+	v.Get("Test-HEader")           // want `use "Test-Header" instead of "Test-HEader"`
+	v.Set("Test-HEader", "value")  // want `use "Test-Header" instead of "Test-HEader"`
+	v.Add("Test-HEader", "value")  // want `use "Test-Header" instead of "Test-HEader"`
+	v.Del("Test-HEader")           // want `use "Test-Header" instead of "Test-HEader"`
+	v.Values("Test-HEader")        // want `use "Test-Header" instead of "Test-HEader"`
+	v.Values(`Raw-STRING-Literal`) // want `use "Raw-String-Literal" instead of "Raw-STRING-Literal"`
 
 	v.Set("Test-Header", "value")
 	v.Add("Test-Header", "value")
