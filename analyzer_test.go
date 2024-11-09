@@ -30,7 +30,6 @@ func TestAnalyzer(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		tt := tt
 		t.Run(tt, func(t *testing.T) {
 			t.Parallel()
 

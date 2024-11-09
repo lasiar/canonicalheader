@@ -21,7 +21,6 @@ func TestNewLiteral(t *testing.T) {
 			err:   `"\"\\xF4\\x00\"" is not a valid utf8 string`,
 		},
 	} {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
