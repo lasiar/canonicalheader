@@ -7,5 +7,5 @@ type embedded struct {
 }
 
 func _() {
-	embedded{}.Get("TT") // want `use "Tt" instead of "TT"`
+	embedded{}.Get("TT") // want `use canonical header key "Tt" instead of "TT"`
 }

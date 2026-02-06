@@ -19,9 +19,9 @@ func _() {
 	var mstr myString = "Tt"
 	http.Header{}.Get(string(mstr))
 
-	http.Header{}.Get(string(underlyingString)) // want `use "Tt" instead of "TT"`
-	http.Header{}.Get(string(underlyingString)) // want `use "Tt" instead of "TT"`
-	http.Header{}.Get(noCanonical)              // want `use "Tt" instead of "TT"`
-	http.Header{}.Get(copiedFromNoCanonical)    // want `use "Tt" instead of "TT"`
+	http.Header{}.Get(string(underlyingString)) // want `use canonical header key "Tt" instead of "TT"`
+	http.Header{}.Get(string(underlyingString)) // want `use canonical header key "Tt" instead of "TT"`
+	http.Header{}.Get(noCanonical)              // want `use canonical header key "Tt" instead of "TT"`
+	http.Header{}.Get(copiedFromNoCanonical)    // want `use canonical header key "Tt" instead of "TT"`
 	http.Header{}.Get(canonical)
 }

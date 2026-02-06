@@ -22,8 +22,8 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Install Go stable
-        uses: actions/setup-go@master
+      - name: Install Go
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
 

@@ -1,6 +1,7 @@
 package canonicalheader
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"go/constant"
@@ -9,6 +10,8 @@ import (
 
 	"golang.org/x/tools/go/analysis"
 )
+
+var errNonConstantKey = errors.New("expression is not a constant key")
 
 type constantString struct {
 	originalValue,
@@ -21,7 +24,7 @@ type constantString struct {
 func newConstantKey(info *types.Info, ident *ast.Ident) (constantString, error) {
 	c, ok := info.ObjectOf(ident).(*types.Const)
 	if !ok {
-		return constantString{}, fmt.Errorf("type %T is not support", c)
+		return constantString{}, fmt.Errorf("%w: %T", errNonConstantKey, c)
 	}
 
 	return constantString{
@@ -37,7 +40,7 @@ func (c constantString) diagnostic(canonicalHeader string) analysis.Diagnostic {
 		Pos: c.pos,
 		End: c.end,
 		Message: fmt.Sprintf(
-			"use %q instead of %q",
+			"use canonical header key %q instead of %q",
 			canonicalHeader,
 			c.originalValue,
 		),

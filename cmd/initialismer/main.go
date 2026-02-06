@@ -3,6 +3,7 @@ package main
 import (
 	"cmp"
 	"embed"
+	"errors"
 	"flag"
 	"fmt"
 	"html/template"
@@ -20,6 +21,8 @@ const (
 	templateMapping = "mapping.tmpl"
 	templateTest    = "test.tmpl"
 )
+
+var errUnknownTarget = errors.New("unknown target")
 
 //nolint:gochecknoglobals // this map no allocate at golangci-lint
 var mustBeIgnore = [...]string{
@@ -284,11 +287,7 @@ const (
 	generateMapping
 )
 
-func parseTarget() (generateTarget, error) {
-	var t string
-	flag.StringVar(&t, "target", "", "test or mapping")
-	flag.Parse()
-
+func parseTarget(t string) (generateTarget, error) {
 	switch t {
 	case generateTest.String():
 		return generateTest, nil
@@ -300,11 +299,31 @@ func parseTarget() (generateTarget, error) {
 		return generateTestGolden, nil
 
 	default:
-		return generateUnknown, fmt.Errorf("unknown target %q", t)
+		return generateUnknown, fmt.Errorf("%w: %q", errUnknownTarget, t)
+	}
+}
+
+func templateNameForTarget(target generateTarget) (string, error) {
+	switch target {
+	case generateTest:
+		return templateTest, nil
+
+	case generateMapping:
+		return templateMapping, nil
+
+	case generateTestGolden:
+		return templateGolden, nil
+
+	default:
+		return "", fmt.Errorf("%w: %q", errUnknownTarget, target.String())
 	}
 }
 
 func main() {
+	var target string
+	flag.StringVar(&target, "target", "", "test, mapping, or test-golden")
+	flag.Parse()
+
 	filtered := make(map[string]struct{}, len(mustBeIgnore))
 
 	type ignore struct {
@@ -334,25 +353,16 @@ func main() {
 		return cmp.Compare(a.Incorrect, b.Incorrect)
 	})
 
-	genTarget, err := parseTarget()
+	genTarget, err := parseTarget(target)
 	if err != nil {
 		slog.Error("parse target:", slog.Any("error", err))
 		os.Exit(1)
 	}
 
-	var templateName string
-	switch genTarget {
-	case generateTest:
-		templateName = templateTest
-
-	case generateMapping:
-		templateName = templateMapping
-
-	case generateTestGolden:
-		templateName = templateGolden
-
-	default:
+	templateName, err := templateNameForTarget(genTarget)
+	if err != nil {
 		slog.Error("unknown target:", slog.String("target", genTarget.String()))
+		os.Exit(1)
 	}
 
 	t := template.Must(template.New("").ParseFS(templates, "templates/*"))
