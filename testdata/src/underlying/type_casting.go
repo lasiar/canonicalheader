@@ -9,7 +9,7 @@ const c = ""
 func _() {
 	http.Header{}.Get(st(c))
 	http.Header{}.Get(st("hello-world"))
-	http.Header{}.Get(string(string(myString("TT")))) // want `use "Tt" instead of "TT"`
+	http.Header{}.Get(string(string(myString("TT")))) // want `use canonical header key "Tt" instead of "TT"`
 	http.Header{}.Get(t())
 }
 

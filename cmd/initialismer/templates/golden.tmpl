@@ -6,6 +6,6 @@ import "net/http"
 func _() {
 h := http.Header{}
 {{range .}}
-    h.Get("{{.Correct}}") // want `use "{{.Correct}}" instead of "{{.Incorrect}}"`
+    h.Get("{{.Correct}}") // want `use canonical header key "{{.Correct}}" instead of "{{.Incorrect}}"`
 {{- end}}
 }

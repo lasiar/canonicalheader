@@ -7,9 +7,9 @@ type HeaderStruct struct {
 }
 
 func (h HeaderStruct) _() {
-	h.header.Get("TT") // want `use "Tt" instead of "TT"`
+	h.header.Get("TT") // want `use canonical header key "Tt" instead of "TT"`
 }
 
 func _() {
-	HeaderStruct{}.header.Get("TT") // want `use "Tt" instead of "TT"`
+	HeaderStruct{}.header.Get("TT") // want `use canonical header key "Tt" instead of "TT"`
 }

@@ -14,7 +14,9 @@ func (s *stringSet) String() string {
 func (s *stringSet) Set(flag string) error {
 	list := strings.Split(flag, ",")
 
-	*s = make(stringSet, 0, len(list))
+	if *s == nil {
+		*s = make(stringSet, 0, len(list))
+	}
 
 	for _, element := range list {
 		element = strings.TrimSpace(element)
