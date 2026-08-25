@@ -128,8 +128,15 @@ func (c *canonicalHeader) run(pass *analysis.Pass) (any, error) {
 			if recv == nil {
 				return
 			}
+
 			gotType = recv.Type()
-			gotMethodName = astcast.ToSelectorExpr(callExp.Fun).Sel.Name
+
+			sel := astcast.ToSelectorExpr(callExp.Fun).Sel
+			if sel == nil {
+				return
+			}
+
+			gotMethodName = sel.Name
 
 		// h := http.Header{}
 		// f := h.Get
@@ -171,6 +178,10 @@ func (c *canonicalHeader) run(pass *analysis.Pass) (any, error) {
 
 			sel, ok := assign.Rhs[indexAssign].(*ast.SelectorExpr)
 			if !ok {
+				return
+			}
+
+			if sel.Sel == nil {
 				return
 			}
 
