@@ -40,6 +40,7 @@ func TestAnalyzer(t *testing.T) {
 		},
 		{pkg: "global"},
 		{pkg: "initialism"},
+		{pkg: "mapaccess"},
 		{pkg: "response"},
 		{pkg: "struct"},
 		{pkg: "underlying"},
