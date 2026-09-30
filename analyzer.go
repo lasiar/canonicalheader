@@ -69,21 +69,6 @@ func (c *canonicalHeader) buildExclusions() map[string]string {
 }
 
 func (c *canonicalHeader) run(pass *analysis.Pass) (any, error) {
-	var headerObject types.Object
-	for _, object := range pass.TypesInfo.Uses {
-		if object.Pkg() != nil &&
-			object.Pkg().Path() == pkgPath &&
-			object.Name() == name {
-			headerObject = object
-			break
-		}
-	}
-
-	if headerObject == nil {
-		//nolint:nilnil // nothing to do here, because http.Header{} not usage.
-		return nil, nil
-	}
-
 	spctor, ok := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 	if !ok {
 		return nil, fmt.Errorf("want %T, got %T", spctor, pass.ResultOf[inspect.Analyzer])
@@ -188,7 +173,7 @@ func (c *canonicalHeader) run(pass *analysis.Pass) (any, error) {
 		}
 
 		// It is not net/http.Header{}.
-		if !types.Identical(gotType, headerObject.Type()) {
+		if !isHeader(gotType) {
 			return
 		}
 
@@ -286,6 +271,18 @@ func canonicalHeaderKey(s string, m map[string]string) string {
 	}
 
 	return wellKnown
+}
+
+// isHeader reports whether t is net/http.Header, possibly through an alias.
+func isHeader(t types.Type) bool {
+	named, ok := types.Unalias(t).(*types.Named)
+	if !ok {
+		return false
+	}
+
+	obj := named.Obj()
+
+	return obj.Pkg() != nil && obj.Pkg().Path() == pkgPath && obj.Name() == name
 }
 
 func isValidMethod(name string) bool {
