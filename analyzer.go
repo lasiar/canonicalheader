@@ -69,21 +69,6 @@ func (c *canonicalHeader) buildExclusions() map[string]string {
 }
 
 func (c *canonicalHeader) run(pass *analysis.Pass) (any, error) {
-	var headerObject types.Object
-	for _, object := range pass.TypesInfo.Uses {
-		if object.Pkg() != nil &&
-			object.Pkg().Path() == pkgPath &&
-			object.Name() == name {
-			headerObject = object
-			break
-		}
-	}
-
-	if headerObject == nil {
-		//nolint:nilnil // nothing to do here, because http.Header{} not usage.
-		return nil, nil
-	}
-
 	spctor, ok := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 	if !ok {
 		return nil, fmt.Errorf("want %T, got %T", spctor, pass.ResultOf[inspect.Analyzer])
@@ -93,11 +78,37 @@ func (c *canonicalHeader) run(pass *analysis.Pass) (any, error) {
 
 	nodeFilter := []ast.Node{
 		(*ast.CallExpr)(nil),
+		(*ast.IndexExpr)(nil),
+		(*ast.CompositeLit)(nil),
 	}
 	var outerErr error
 
 	spctor.Preorder(nodeFilter, func(n ast.Node) {
 		if outerErr != nil {
+			return
+		}
+
+		switch t := n.(type) {
+		// h["Test-Header"].
+		case *ast.IndexExpr:
+			if isHeader(pass.TypesInfo.TypeOf(t.X)) {
+				checkMapKey(pass, t.Index)
+			}
+
+			return
+
+		// http.Header{"Test-Header": nil}.
+		case *ast.CompositeLit:
+			if !isHeader(pass.TypesInfo.TypeOf(t)) {
+				return
+			}
+
+			for _, elt := range t.Elts {
+				if kv, ok := elt.(*ast.KeyValueExpr); ok {
+					checkMapKey(pass, kv.Key)
+				}
+			}
+
 			return
 		}
 
@@ -183,12 +194,20 @@ func (c *canonicalHeader) run(pass *analysis.Pass) (any, error) {
 			obj := pass.TypesInfo.ObjectOf(ident)
 			gotType = obj.Type()
 
+		// delete(h, "Test-Header").
+		case *types.Builtin:
+			if t.Name() == "delete" && len(callExp.Args) == 2 && isHeader(pass.TypesInfo.TypeOf(callExp.Args[0])) {
+				checkMapKey(pass, callExp.Args[1])
+			}
+
+			return
+
 		default:
 			return
 		}
 
 		// It is not net/http.Header{}.
-		if !types.Identical(gotType, headerObject.Type()) {
+		if !isHeader(gotType) {
 			return
 		}
 
@@ -203,64 +222,8 @@ func (c *canonicalHeader) run(pass *analysis.Pass) (any, error) {
 			return
 		}
 
-		callArg := callExp.Args[0]
-
-		// Check for type casting from myString to string.
-		// it could be: Get(string(string(string(myString)))).
-		// need this node------------------------^^^^^^^^.
-		for {
-			// If it is not *ast.CallExpr, this is a value.
-			c, ok := callArg.(*ast.CallExpr)
-			if !ok {
-				break
-			}
-
-			// Some function is called, skip this case.
-			if len(c.Args) == 0 {
-				return
-			}
-
-			f, ok := c.Fun.(*ast.Ident)
-			if !ok {
-				break
-			}
-
-			obj := pass.TypesInfo.ObjectOf(f)
-			// nil may be by code, but not by logic.
-			// TypeInfo should contain of type.
-			if obj == nil {
-				break
-			}
-
-			// This is function.
-			// Skip this method call.
-			_, ok = obj.Type().(*types.Signature)
-			if ok {
-				return
-			}
-
-			callArg = c.Args[0]
-		}
-
-		var arg argumenter
-		switch t := callArg.(type) {
-		case *ast.BasicLit:
-			lString, err := newLiteralString(t)
-			if err != nil {
-				return
-			}
-
-			arg = lString
-
-		case *ast.Ident:
-			constString, err := newConstantKey(pass.TypesInfo, t)
-			if err != nil {
-				return
-			}
-
-			arg = constString
-
-		default:
+		arg, ok := newArgument(pass.TypesInfo, callExp.Args[0])
+		if !ok {
 			return
 		}
 
@@ -277,6 +240,84 @@ func (c *canonicalHeader) run(pass *analysis.Pass) (any, error) {
 	return nil, outerErr
 }
 
+// checkMapKey reports keys that bypass canonicalization through direct map
+// access: exclusions do not apply, since any other spelling is a silent miss.
+func checkMapKey(pass *analysis.Pass, key ast.Expr) {
+	arg, ok := newArgument(pass.TypesInfo, key)
+	if !ok {
+		return
+	}
+
+	argValue := arg.value()
+
+	headerKeyCanonical := http.CanonicalHeaderKey(argValue)
+	if argValue == headerKeyCanonical {
+		return
+	}
+
+	pass.Report(arg.diagnostic(headerKeyCanonical))
+}
+
+func newArgument(info *types.Info, expr ast.Expr) (argumenter, bool) {
+	// Check for type casting from myString to string.
+	// it could be: Get(string(string(string(myString)))).
+	// need this node------------------------^^^^^^^^.
+	for {
+		// If it is not *ast.CallExpr, this is a value.
+		c, ok := expr.(*ast.CallExpr)
+		if !ok {
+			break
+		}
+
+		// Some function is called, skip this case.
+		if len(c.Args) == 0 {
+			return nil, false
+		}
+
+		f, ok := c.Fun.(*ast.Ident)
+		if !ok {
+			break
+		}
+
+		obj := info.ObjectOf(f)
+		// nil may be by code, but not by logic.
+		// TypeInfo should contain of type.
+		if obj == nil {
+			break
+		}
+
+		// This is function.
+		// Skip this method call.
+		_, ok = obj.Type().(*types.Signature)
+		if ok {
+			return nil, false
+		}
+
+		expr = c.Args[0]
+	}
+
+	switch t := expr.(type) {
+	case *ast.BasicLit:
+		lString, err := newLiteralString(t)
+		if err != nil {
+			return nil, false
+		}
+
+		return lString, true
+
+	case *ast.Ident:
+		constString, err := newConstantKey(info, t)
+		if err != nil {
+			return nil, false
+		}
+
+		return constString, true
+
+	default:
+		return nil, false
+	}
+}
+
 func canonicalHeaderKey(s string, m map[string]string) string {
 	canonical := http.CanonicalHeaderKey(s)
 
@@ -286,6 +327,18 @@ func canonicalHeaderKey(s string, m map[string]string) string {
 	}
 
 	return wellKnown
+}
+
+// isHeader reports whether t is net/http.Header, possibly through an alias.
+func isHeader(t types.Type) bool {
+	named, ok := types.Unalias(t).(*types.Named)
+	if !ok {
+		return false
+	}
+
+	obj := named.Obj()
+
+	return obj.Pkg() != nil && obj.Pkg().Path() == pkgPath && obj.Name() == name
 }
 
 func isValidMethod(name string) bool {

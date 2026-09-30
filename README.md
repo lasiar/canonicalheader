@@ -75,3 +75,18 @@ func main() {
 }
 
 ```
+
+### Map access
+
+Indexing `http.Header` directly, deleting from it and writing a composite
+literal skip canonicalization, so a non-canonical key silently misses.
+These keys must match `http.CanonicalHeaderKey` exactly; exclusions do not
+apply. Deliberate non-canonical writes need a `//nolint:canonicalheader`
+directive.
+
+```go
+h["Test-HEader"] = append(h["Test-HEader"], "value") // flagged twice
+delete(h, "Test-HEader")                              // flagged
+_ = http.Header{"Test-HEader": nil}                   // flagged
+_ = h["ETag"]                                         // flagged, net/http stores "Etag"
+```
