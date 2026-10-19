@@ -39,6 +39,7 @@ func TestAnalyzer(t *testing.T) {
 				return a
 			},
 		},
+		{pkg: "expressions"},
 		{pkg: "generic"},
 		{pkg: "global"},
 		{pkg: "initialism"},
