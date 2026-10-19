@@ -1,10 +1,25 @@
 version: 2
+
 updates:
   - package-ecosystem: gomod
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: monthly
+      day: "sunday"
+      time: "11:00" # 11am UTC
+    groups:
+      gomod:
+        patterns:
+          - "*"  # Group all updates into a single larger pull request.
+    cooldown:
+      default-days: 7
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: monthly
+    groups:
+      github-actions:
+        patterns:
+          - "*"  # Group all updates into a single larger pull request.
+    cooldown:
+      default-days: 7
