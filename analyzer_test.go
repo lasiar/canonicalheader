@@ -1,6 +1,7 @@
 package canonicalheader_test
 
 import (
+	"go/ast"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -38,6 +39,7 @@ func TestAnalyzer(t *testing.T) {
 				return a
 			},
 		},
+		{pkg: "generic"},
 		{pkg: "global"},
 		{pkg: "initialism"},
 		{pkg: "struct"},
@@ -84,6 +86,56 @@ func TestAnalyzer(t *testing.T) {
 			got,
 		)
 	})
+}
+
+func TestAnalyzerMissingAssignedSelector(t *testing.T) {
+	t.Parallel()
+
+	dir, cleanup, err := analysistest.WriteFiles(map[string]string{
+		"missingselector/missingselector.go": `package missingselector
+
+import "net/http"
+
+func _() {
+	h := http.Header{}
+	get := h.Get
+	get("X-HEADER")
+	h.Get("X-HEADER") // want "use \"X-Header\" instead of \"X-HEADER\""
+}
+`,
+	})
+	require.NoError(t, err)
+	t.Cleanup(cleanup)
+
+	a := canonicalheader.New()
+	run := a.Run
+	var missingSelectors int
+	a.Run = func(pass *analysis.Pass) (any, error) {
+		// A valid selector always has a name. Clear it after type checking to
+		// exercise the defensive check for an incomplete method assignment.
+		for _, file := range pass.Files {
+			ast.Inspect(file, func(n ast.Node) bool {
+				assign, ok := n.(*ast.AssignStmt)
+				if !ok {
+					return true
+				}
+
+				for _, rhs := range assign.Rhs {
+					if selector, ok := rhs.(*ast.SelectorExpr); ok {
+						selector.Sel = nil
+						missingSelectors++
+					}
+				}
+
+				return false
+			})
+		}
+
+		return run(pass)
+	}
+
+	analysistest.Run(t, dir, a, "missingselector")
+	require.Equal(t, 1, missingSelectors)
 }
 
 func transform[S ~[]E, E any, T any](sl S, f func(E) T) []T {
