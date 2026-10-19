@@ -154,7 +154,7 @@ func BenchmarkCanonical(b *testing.B) {
 	}
 	b.ReportAllocs()
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		s := v.Get("Canonical-Header")
 		if s != testValue {
 			b.Fatal()
@@ -168,7 +168,7 @@ func BenchmarkNonCanonical(b *testing.B) {
 	}
 	b.ReportAllocs()
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		s := v.Get("CANONICAL-HEADER")
 		if s != testValue {
 			b.Fatal()

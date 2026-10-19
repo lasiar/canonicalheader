@@ -10,6 +10,7 @@ import (
 
 func TestNewLiteral(t *testing.T) {
 	t.Parallel()
+
 	for _, tt := range []struct {
 		name  string
 		value string
